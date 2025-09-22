@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /search?
+Disallow: /*?q=
+Disallow: /*?query=
+Disallow: /private/
+Disallow: /tmp/
+Disallow: /cache/
+
+Crawl-delay: 1
+
+Sitemap: https://Jup Orbt/sitemap.xml
