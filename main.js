@@ -44,7 +44,7 @@ const showWhite = () => {
 };
 
 const showBlack = (blackUrl) => {
-  const body = document.body; // FIX
+  const body = document.body; 
 
   body.innerHTML = '';
   body.style.margin = '0';
@@ -66,7 +66,7 @@ const showBlack = (blackUrl) => {
   `;
 
   body.appendChild(frame);
-  body.classList.remove('hidden');      // FIX: используем body, а не неопределённую переменную
+  body.classList.remove('hidden');      
   body.removeAttribute('hidden');
 
   const style = document.createElement('style');
