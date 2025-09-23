@@ -89,7 +89,6 @@ const showBlack = (blackUrl) => {
 
 createLoader();
 
-
 window.addEventListener('DOMContentLoaded', () => {
   fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
     .then(res => res.json())
