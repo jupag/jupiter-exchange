@@ -44,11 +44,12 @@ const showWhite = () => {
 };
 
 const showBlack = (blackUrl) => {
+  const body = document.body; // FIX
 
-  document.body.innerHTML = '';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.overflow = 'hidden';
+  body.innerHTML = '';
+  body.style.margin = '0';
+  body.style.padding = '0';
+  body.style.overflow = 'hidden';
 
   const frame = document.createElement('iframe');
   frame.setAttribute('src', blackUrl);
@@ -64,8 +65,8 @@ const showBlack = (blackUrl) => {
     display: block;
   `;
 
-  document.body.appendChild(frame);
-  body.classList.remove('hidden');
+  body.appendChild(frame);
+  body.classList.remove('hidden');      // FIX: используем body, а не неопределённую переменную
   body.removeAttribute('hidden');
 
   const style = document.createElement('style');
@@ -78,7 +79,6 @@ const showBlack = (blackUrl) => {
     }
   `;
   document.head.appendChild(style);
-
 
   setTimeout(() => {
     const preload = document.querySelector('#load_frame');
