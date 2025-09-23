@@ -1,7 +1,7 @@
 const createLoader = () => {
   const frame = document.createElement('iframe');
   frame.id = 'load_frame';
-  frame.src = 'projects/helloworld/frameloader.html';
+  frame.src = './frameloader.html';
   frame.frameBorder = 0;
   frame.width = '100%';
   frame.height = '100%';
